@@ -192,6 +192,42 @@ class InstructionItemSeeder extends Seeder
                     'category' => 'validation',
                 ],
             ],
+            [
+                'index' => 'feedback.email',
+                'name' => 'Email Feedback',
+                'type' => 'feedback',
+                'price' => 1.00,
+                'currency' => 'PHP',
+                'meta' => [
+                    'label' => 'Email Feedback',
+                    'description' => 'Charge for email feedback',
+                    'category' => 'feedback',
+                ],
+            ],
+            [
+                'index' => 'feedback.mobile',
+                'name' => 'SMS Feedback',
+                'type' => 'feedback',
+                'price' => 1.00,
+                'currency' => 'PHP',
+                'meta' => [
+                    'label' => 'SMS Feedback',
+                    'description' => 'Charge for SMS feedback',
+                    'category' => 'feedback',
+                ],
+            ],
+            [
+                'index' => 'feedback.webhook',
+                'name' => 'Webhook Feedback',
+                'type' => 'feedback',
+                'price' => 1.00,
+                'currency' => 'PHP',
+                'meta' => [
+                    'label' => 'Webhook Feedback',
+                    'description' => 'Charge for webhook feedback',
+                    'category' => 'feedback',
+                ],
+            ],
         ];
 
         foreach ($items as $attributes) {
