@@ -66,7 +66,7 @@ it('can total charges by indices', function () {
         'inputs.fields.signature',
     ]);
 
-    expect($total)->toBe(8.0);
+    expect((float) $total)->toBe(8.0);
 });
 
 it('can return descriptions for indices', function () {

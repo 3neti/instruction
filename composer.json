@@ -27,6 +27,8 @@
         "illuminate/support": "^11.0|^12.0|^13.0",
         "illuminate/database": "^11.0|^12.0|^13.0",
         "illuminate/contracts": "^11.0|^12.0|^13.0",
+        "bavix/laravel-wallet": "^11.5",
+        "brick/money": "^0.10|^0.11|^0.12|^0.13",
         "spatie/laravel-data": "^4.0"
     },
     "require-dev": {

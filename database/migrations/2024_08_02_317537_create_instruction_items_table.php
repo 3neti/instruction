@@ -13,7 +13,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('index')->unique();
             $table->string('type')->index();
-            $table->decimal('price', 12, 2)->default(0);
+            $table->bigInteger('price')->default(0); // minor units
             $table->string('currency', 3)->default('PHP');
             $table->json('meta')->nullable();
             $table->nullableMorphs('revenue_destination');

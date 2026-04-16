@@ -2,6 +2,7 @@
 
 namespace LBHurtado\Instruction\Tests;
 
+use Bavix\Wallet\WalletServiceProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use LBHurtado\Instruction\InstructionServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
@@ -22,6 +23,7 @@ abstract class TestCase extends Orchestra
     {
         return [
             LaravelDataServiceProvider::class,
+            WalletServiceProvider::class,
             InstructionServiceProvider::class,
         ];
     }
@@ -39,7 +41,9 @@ abstract class TestCase extends Orchestra
         $app['config']->set('instruction.debug', false);
         $app['config']->set('instruction.system_user_email', 'system@example.com');
 
-        // Spatie Laravel Data safeguards
+        $app['config']->set('wallet.deposit.confirmed', true);
+        $app['config']->set('wallet.withdraw.confirmed', true);
+
         $app['config']->set('data.validation_strategy', 'always');
         $app['config']->set('data.max_transformation_depth', 6);
         $app['config']->set('data.throw_when_max_transformation_depth_reached', 6);
@@ -50,11 +54,12 @@ abstract class TestCase extends Orchestra
             \Spatie\LaravelData\Normalizers\ArrayNormalizer::class,
             \Spatie\LaravelData\Normalizers\JsonNormalizer::class,
         ]);
-        $app['config']->set('data.date_format', "Y-m-d\\TH:i:sP");
+        $app['config']->set('data.date_format', 'Y-m-d\\TH:i:sP');
     }
 
     protected function defineDatabaseMigrations(): void
     {
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+        $this->loadMigrationsFrom(__DIR__.'/database/migrations');
     }
 }

@@ -27,7 +27,7 @@ it('ignores excluded fields', function () {
     makeItem([
         'name' => 'Count',
         'index' => 'count',
-        'price' => 10,
+        'price' => '10.00',
     ]);
 
     $result = $this->service->evaluate($this->customer, ['count' => 2]);
@@ -39,21 +39,22 @@ it('charges truthy string values', function () {
     makeItem([
         'name' => 'Secret',
         'index' => 'secret',
-        'price' => 10,
+        'price' => '10.00',
     ]);
 
     $result = $this->service->evaluate($this->customer, ['secret' => 'ABC123']);
 
     expect($result)->toHaveCount(1)
         ->and($result->first()->index)->toBe('secret')
-        ->and($result->first()->price)->toBe(10.0);
+        ->and($result->first()->price_minor)->toBe(1000)
+        ->and($result->first()->toArray()['price'])->toBe(10.0);
 });
 
 it('does not charge empty string values', function () {
     makeItem([
         'name' => 'Secret',
         'index' => 'secret',
-        'price' => 10,
+        'price' => '10.00',
     ]);
 
     $result = $this->service->evaluate($this->customer, ['secret' => '']);
@@ -65,32 +66,34 @@ it('charges truthy boolean values', function () {
     makeItem([
         'name' => 'OTP',
         'index' => 'otp.required',
-        'price' => 2,
+        'price' => '2.00',
     ]);
 
     $result = $this->service->evaluate($this->customer, ['otp' => ['required' => true]]);
 
     expect($result)->toHaveCount(1)
-        ->and($result->first()->price)->toBe(2.0);
+        ->and($result->first()->price_minor)->toBe(200)
+        ->and($result->first()->toArray()['price'])->toBe(2.0);
 });
 
 it('charges positive integer values', function () {
     makeItem([
         'name' => 'Attempts',
         'index' => 'attempts',
-        'price' => 4,
+        'price' => '4.00',
     ]);
 
     $result = $this->service->evaluate($this->customer, ['attempts' => 3]);
 
-    expect($result)->toHaveCount(1);
+    expect($result)->toHaveCount(1)
+        ->and($result->first()->price_minor)->toBe(400);
 });
 
 it('does not charge zero integer values', function () {
     makeItem([
         'name' => 'Attempts',
         'index' => 'attempts',
-        'price' => 4,
+        'price' => '4.00',
     ]);
 
     $result = $this->service->evaluate($this->customer, ['attempts' => 0]);
@@ -102,24 +105,26 @@ it('charges positive float values', function () {
     makeItem([
         'name' => 'Fee',
         'index' => 'fee',
-        'price' => 7,
+        'price' => '7.00',
     ]);
 
     $result = $this->service->evaluate($this->customer, ['fee' => 1.5]);
 
-    expect($result)->toHaveCount(1);
+    expect($result)->toHaveCount(1)
+        ->and($result->first()->price_minor)->toBe(700);
 });
 
 it('charges non empty array values', function () {
     makeItem([
         'name' => 'Meta',
         'index' => 'meta',
-        'price' => 9,
+        'price' => '9.00',
     ]);
 
     $result = $this->service->evaluate($this->customer, ['meta' => ['a' => 1]]);
 
-    expect($result)->toHaveCount(1);
+    expect($result)->toHaveCount(1)
+        ->and($result->first()->price_minor)->toBe(900);
 });
 
 it('does not charge zero priced items', function () {
@@ -138,7 +143,7 @@ it('multiplies charge by count', function () {
     makeItem([
         'name' => 'Email',
         'index' => 'inputs.fields.email',
-        'price' => 5,
+        'price' => '5.00',
     ]);
 
     $result = $this->service->evaluate($this->customer, [
@@ -150,7 +155,9 @@ it('multiplies charge by count', function () {
 
     expect($result)->toHaveCount(1)
         ->and($result->first()->quantity)->toBe(3)
-        ->and($result->first()->price)->toBe(15.0);
+        ->and($result->first()->unit_price_minor)->toBe(500)
+        ->and($result->first()->price_minor)->toBe(1500)
+        ->and($result->first()->toArray()['price'])->toBe(15.0);
 });
 
 it('uses meta label when present', function () {
@@ -219,7 +226,7 @@ it('reads nested cash validation values', function () {
     makeItem([
         'name' => 'OTP Validation',
         'index' => 'cash.validation.otp',
-        'price' => 6,
+        'price' => '6.00',
     ]);
 
     $result = $this->service->evaluate($this->customer, [
@@ -230,14 +237,15 @@ it('reads nested cash validation values', function () {
         ],
     ]);
 
-    expect($result)->toHaveCount(1);
+    expect($result)->toHaveCount(1)
+        ->and($result->first()->price_minor)->toBe(600);
 });
 
 it('charges validation item when required is true', function () {
     makeItem([
         'name' => 'Location Validation',
         'index' => 'validation.location',
-        'price' => 2,
+        'price' => '2.00',
     ]);
 
     $result = $this->service->evaluate($this->customer, [
@@ -246,7 +254,8 @@ it('charges validation item when required is true', function () {
         ],
     ]);
 
-    expect($result)->toHaveCount(1);
+    expect($result)->toHaveCount(1)
+        ->and($result->first()->price_minor)->toBe(200);
 });
 
 it('does not charge validation item when required is false', function () {
@@ -269,7 +278,7 @@ it('charges time validation item when window is configured', function () {
     makeItem([
         'name' => 'Time Validation',
         'index' => 'validation.time',
-        'price' => 2,
+        'price' => '2.00',
     ]);
 
     $result = $this->service->evaluate($this->customer, [
@@ -278,14 +287,15 @@ it('charges time validation item when window is configured', function () {
         ],
     ]);
 
-    expect($result)->toHaveCount(1);
+    expect($result)->toHaveCount(1)
+        ->and($result->first()->price_minor)->toBe(200);
 });
 
 it('charges time validation item when limit minutes is configured', function () {
     makeItem([
         'name' => 'Time Validation',
         'index' => 'validation.time',
-        'price' => 2,
+        'price' => '2.00',
     ]);
 
     $result = $this->service->evaluate($this->customer, [
@@ -294,7 +304,8 @@ it('charges time validation item when limit minutes is configured', function () 
         ],
     ]);
 
-    expect($result)->toHaveCount(1);
+    expect($result)->toHaveCount(1)
+        ->and($result->first()->price_minor)->toBe(200);
 });
 
 it('does not charge time validation item when empty', function () {
@@ -317,7 +328,7 @@ it('adds fixed slice fee for additional slices only', function () {
     makeItem([
         'name' => 'Slice Fee',
         'index' => 'cash.slice_fee',
-        'price' => 3,
+        'price' => '3.00',
     ]);
 
     $result = $this->service->evaluate($this->customer, [
@@ -331,14 +342,15 @@ it('adds fixed slice fee for additional slices only', function () {
     expect($result)->toHaveCount(1)
         ->and($result->first()->index)->toBe('cash.slice_fee')
         ->and($result->first()->slice_count)->toBe(3)
-        ->and($result->first()->price)->toBe(18.0);
+        ->and($result->first()->price_minor)->toBe(1800)
+        ->and($result->first()->toArray()['price'])->toBe(18.0);
 });
 
 it('adds open slice fee for additional slices only', function () {
     makeItem([
         'name' => 'Slice Fee',
         'index' => 'cash.slice_fee',
-        'price' => 3,
+        'price' => '3.00',
     ]);
 
     $result = $this->service->evaluate($this->customer, [
@@ -350,7 +362,8 @@ it('adds open slice fee for additional slices only', function () {
 
     expect($result)->toHaveCount(1)
         ->and($result->first()->slice_count)->toBe(4)
-        ->and($result->first()->price)->toBe(12.0);
+        ->and($result->first()->price_minor)->toBe(1200)
+        ->and($result->first()->toArray()['price'])->toBe(12.0);
 });
 
 it('does not add slice fee when there are no additional slices', function () {
@@ -374,7 +387,7 @@ it('returns charge estimate dto', function () {
     makeItem([
         'name' => 'Email',
         'index' => 'inputs.fields.email',
-        'price' => 5,
+        'price' => '5.00',
     ]);
 
     $estimate = $this->service->estimate($this->customer, new ArrayInstructionSource([
@@ -384,6 +397,7 @@ it('returns charge estimate dto', function () {
     ]));
 
     expect($estimate->total_items_charged)->toBe(1)
-        ->and($estimate->total_amount)->toBe(5.0)
+        ->and($estimate->total_amount_minor)->toBe(500)
+        ->and($estimate->toArray()['total_amount'])->toBe(5.0)
         ->and($estimate->charges)->toHaveCount(1);
 });

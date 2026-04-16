@@ -12,7 +12,7 @@ it('returns estimate data from the evaluator action', function () {
         'name' => 'Email',
         'index' => 'inputs.fields.email',
         'type' => 'fields',
-        'price' => 5,
+        'price' => '5.00',
         'currency' => 'PHP',
         'meta' => [],
     ]);
@@ -29,5 +29,6 @@ it('returns estimate data from the evaluator action', function () {
     );
 
     expect($result->total_items_charged)->toBe(1)
-        ->and($result->total_amount)->toBe(5.0);
+        ->and($result->total_amount_minor)->toBe(500)
+        ->and($result->toArray()['total_amount'])->toBe(5.0);
 });

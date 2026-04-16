@@ -2,6 +2,7 @@
 
 namespace LBHurtado\Instruction\Services;
 
+use Bavix\Wallet\Interfaces\Customer;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LBHurtado\Instruction\Contracts\ChargeableCustomer;
@@ -26,7 +27,7 @@ class InstructionCostEvaluator
     ) {}
 
     public function evaluate(
-        ChargeableCustomer $customer,
+        Customer|ChargeableCustomer $customer,
         InstructionSourceContract|array $source
     ): Collection {
         $sourceArray = $source instanceof InstructionSourceContract
@@ -35,11 +36,13 @@ class InstructionCostEvaluator
 
         $charges = collect();
         $items = $this->repository->all();
-        $count = data_get($sourceArray, 'count', 1);
+        $count = (int) data_get($sourceArray, 'count', 1);
 
         if (config('instruction.debug')) {
             Log::debug('[InstructionCostEvaluator] Starting evaluation', [
-                'customer' => $customer->getChargeIdentifier(),
+                'customer' => $customer instanceof ChargeableCustomer
+                    ? $customer->getChargeIdentifier()
+                    : get_class($customer),
                 'instruction_items_count' => $items->count(),
                 'count' => $count,
                 'source_data' => $sourceArray,
@@ -97,7 +100,7 @@ class InstructionCostEvaluator
                     $isEnabled = false;
                 }
 
-                $shouldCharge = $isEnabled && $item->price > 0;
+                $shouldCharge = $isEnabled && $item->price_minor > 0;
             } else {
                 $isTruthyString = is_string($value) && trim($value) !== '';
                 $isTruthyBoolean = is_bool($value) && $value === true;
@@ -106,15 +109,15 @@ class InstructionCostEvaluator
                 $isTruthyObject = (is_array($value) || is_object($value)) && ! empty((array) $value);
 
                 $shouldCharge = (
-                    $isTruthyString ||
-                    $isTruthyBoolean ||
-                    $isTruthyInteger ||
-                    $isTruthyFloat ||
-                    $isTruthyObject
-                ) && $item->price > 0;
+                        $isTruthyString ||
+                        $isTruthyBoolean ||
+                        $isTruthyInteger ||
+                        $isTruthyFloat ||
+                        $isTruthyObject
+                    ) && $item->price_minor > 0;
             }
 
-            $price = $item->getAmountProduct($customer);
+            $priceMinor = (int) $item->getAmountProduct($customer);
 
             if ($shouldCharge) {
                 $label = $item->meta['label'] ?? $item->name;
@@ -122,9 +125,9 @@ class InstructionCostEvaluator
                 $charges->push(new ChargeBreakdownData(
                     index: $item->index,
                     value: $value,
-                    unit_price: $price,
+                    unit_price_minor: $priceMinor,
                     quantity: $count,
-                    price: $price * $count,
+                    price_minor: $priceMinor * $count,
                     currency: $item->currency,
                     label: $label,
                     pay_count: 1,
@@ -134,24 +137,24 @@ class InstructionCostEvaluator
 
         if (data_get($sourceArray, 'cash.slice_mode') !== null) {
             $additionalSlices = match (data_get($sourceArray, 'cash.slice_mode')) {
-                'fixed' => data_get($sourceArray, 'cash.slices', 1) - 1,
-                'open' => data_get($sourceArray, 'cash.max_slices', 1) - 1,
+                'fixed' => max(0, (int) data_get($sourceArray, 'cash.slices', 1) - 1),
+                'open' => max(0, (int) data_get($sourceArray, 'cash.max_slices', 1) - 1),
                 default => 0,
             };
 
             if ($additionalSlices > 0) {
                 $sliceFeeItem = $this->repository->findByIndex('cash.slice_fee');
 
-                if ($sliceFeeItem && $sliceFeeItem->price > 0) {
-                    $sliceFeePrice = $sliceFeeItem->getAmountProduct($customer);
+                if ($sliceFeeItem && $sliceFeeItem->price_minor > 0) {
+                    $sliceFeePriceMinor = (int) $sliceFeeItem->getAmountProduct($customer);
                     $sliceFeeLabel = $sliceFeeItem->meta['label'] ?? $sliceFeeItem->name;
 
                     $charges->push(new ChargeBreakdownData(
                         index: 'cash.slice_fee',
                         value: $additionalSlices,
-                        unit_price: $sliceFeePrice,
+                        unit_price_minor: $sliceFeePriceMinor,
                         quantity: $count,
-                        price: $sliceFeePrice * $additionalSlices * $count,
+                        price_minor: $sliceFeePriceMinor * $additionalSlices * $count,
                         currency: $sliceFeeItem->currency,
                         label: $sliceFeeLabel,
                         pay_count: $additionalSlices,
@@ -165,14 +168,14 @@ class InstructionCostEvaluator
     }
 
     public function estimate(
-        ChargeableCustomer $customer,
+        Customer|ChargeableCustomer $customer,
         InstructionSourceContract|array $source
     ): ChargeEstimateData {
         $charges = $this->evaluate($customer, $source);
 
         return new ChargeEstimateData(
             charges: $charges->all(),
-            total_amount: $charges->sum('price'),
+            total_amount_minor: $charges->sum('price_minor'),
             total_items_charged: $charges->count(),
             currency: 'PHP',
         );
