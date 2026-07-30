@@ -8,6 +8,7 @@ it('seeds canonical instruction items', function () {
 
     expect(InstructionItem::query()->where('index', 'cash.amount')->exists())->toBeTrue()
         ->and(InstructionItem::query()->where('index', 'cash.slice_fee')->exists())->toBeTrue()
+        ->and(InstructionItem::query()->where('index', 'onboarding.enabled')->value('price'))->toBe(1_000)
         ->and(InstructionItem::query()->where('index', 'inputs.fields.email')->exists())->toBeTrue()
         ->and(InstructionItem::query()->where('index', 'validation.location')->exists())->toBeTrue();
 });

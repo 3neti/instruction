@@ -34,6 +34,20 @@ class InstructionItemSeeder extends Seeder
                     'category' => 'cash',
                 ],
             ],
+            [
+                'index' => 'onboarding.enabled',
+                'name' => 'Account Onboarding',
+                'type' => 'onboarding',
+                'price' => 10.00,
+                'currency' => 'PHP',
+                'meta' => [
+                    'label' => 'Account Onboarding',
+                    'description' => 'Identity resolution, Account provisioning, and claimant handoff',
+                    'category' => 'onboarding',
+                    'catalog_reference' => 'pay-code',
+                    'catalog_version' => 3,
+                ],
+            ],
 
             [
                 'index' => 'inputs.fields.name',
