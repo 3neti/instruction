@@ -16,13 +16,13 @@ class InstructionItemFactory extends Factory
     public function definition(): array
     {
         $index = 'inputs.fields.'.$this->faker->unique()->randomElement([
-                'name',
-                'email',
-                'mobile',
-                'address',
-                'birth_date',
-                'signature',
-            ]);
+            'name',
+            'email',
+            'mobile',
+            'address',
+            'birth_date',
+            'signature',
+        ]);
 
         return array_merge(
             InstructionItem::attributesFromIndex($index),

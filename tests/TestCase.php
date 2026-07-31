@@ -7,6 +7,11 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use LBHurtado\Instruction\InstructionServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Spatie\LaravelData\LaravelDataServiceProvider;
+use Spatie\LaravelData\Normalizers\ArrayableNormalizer;
+use Spatie\LaravelData\Normalizers\ArrayNormalizer;
+use Spatie\LaravelData\Normalizers\JsonNormalizer;
+use Spatie\LaravelData\Normalizers\ModelNormalizer;
+use Spatie\LaravelData\Normalizers\ObjectNormalizer;
 
 abstract class TestCase extends Orchestra
 {
@@ -48,11 +53,11 @@ abstract class TestCase extends Orchestra
         $app['config']->set('data.max_transformation_depth', 6);
         $app['config']->set('data.throw_when_max_transformation_depth_reached', 6);
         $app['config']->set('data.normalizers', [
-            \Spatie\LaravelData\Normalizers\ModelNormalizer::class,
-            \Spatie\LaravelData\Normalizers\ArrayableNormalizer::class,
-            \Spatie\LaravelData\Normalizers\ObjectNormalizer::class,
-            \Spatie\LaravelData\Normalizers\ArrayNormalizer::class,
-            \Spatie\LaravelData\Normalizers\JsonNormalizer::class,
+            ModelNormalizer::class,
+            ArrayableNormalizer::class,
+            ObjectNormalizer::class,
+            ArrayNormalizer::class,
+            JsonNormalizer::class,
         ]);
         $app['config']->set('data.date_format', 'Y-m-d\\TH:i:sP');
     }

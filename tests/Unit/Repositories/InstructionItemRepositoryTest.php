@@ -4,7 +4,7 @@ use LBHurtado\Instruction\Models\InstructionItem;
 use LBHurtado\Instruction\Repositories\InstructionItemRepository;
 
 beforeEach(function () {
-    $this->repository = new InstructionItemRepository();
+    $this->repository = new InstructionItemRepository;
 
     InstructionItem::query()->create([
         'name' => 'Email',

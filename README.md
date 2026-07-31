@@ -58,7 +58,7 @@ This ensures:
 ## Installation
 
 ```bash
-composer require 3neti/instruction
+composer require 3neti/instruction:^0.3
 ```
 
 Publish config and migrations:
@@ -322,6 +322,9 @@ Client / API / Host App
 ------------------------------------------------------------------------
 
 ## Testing
+
+The current release matrix covers PHP 8.3 and 8.4 on Laravel 12
+and 13. Laravel 11 remains supported by the package constraints.
 
 ```bash
 composer test

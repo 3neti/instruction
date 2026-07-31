@@ -10,9 +10,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class WalletCustomer extends Model implements Customer
 {
+    use CanPay;
     use HasFactory;
     use HasWallet;
-    use CanPay;
 
     protected $table = 'wallet_customers';
 

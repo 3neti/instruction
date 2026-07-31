@@ -109,12 +109,12 @@ class InstructionCostEvaluator
                 $isTruthyObject = (is_array($value) || is_object($value)) && ! empty((array) $value);
 
                 $shouldCharge = (
-                        $isTruthyString ||
-                        $isTruthyBoolean ||
-                        $isTruthyInteger ||
-                        $isTruthyFloat ||
-                        $isTruthyObject
-                    ) && $item->price_minor > 0;
+                    $isTruthyString ||
+                    $isTruthyBoolean ||
+                    $isTruthyInteger ||
+                    $isTruthyFloat ||
+                    $isTruthyObject
+                ) && $item->price_minor > 0;
             }
 
             $priceMinor = (int) $item->getAmountProduct($customer);

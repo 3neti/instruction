@@ -6,7 +6,7 @@ use LBHurtado\Instruction\Models\InstructionItem;
 use LBHurtado\Instruction\Tests\Fixtures\WalletCustomer;
 
 it('implements the bavix product interface', function () {
-    expect(new InstructionItem())->toBeInstanceOf(ProductInterface::class);
+    expect(new InstructionItem)->toBeInstanceOf(ProductInterface::class);
 });
 
 it('can build default attributes from index', function () {

@@ -7,4 +7,5 @@
 .env.testing
 composer.lock
 coverage
+.phpunit.cache/
 .phpunit.result.cache

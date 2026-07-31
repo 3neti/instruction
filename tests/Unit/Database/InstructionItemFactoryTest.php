@@ -1,5 +1,6 @@
 <?php
 
+use Brick\Money\Money;
 use LBHurtado\Instruction\Models\InstructionItem;
 
 it('can create an instruction item using the factory', function () {
@@ -7,7 +8,7 @@ it('can create an instruction item using the factory', function () {
 
     expect($item)->toBeInstanceOf(InstructionItem::class)
         ->and($item->index)->not->toBeEmpty()
-        ->and($item->price)->toBeInstanceOf(\Brick\Money\Money::class);
+        ->and($item->price)->toBeInstanceOf(Money::class);
 });
 
 it('can create a cash amount item using the factory state', function () {
